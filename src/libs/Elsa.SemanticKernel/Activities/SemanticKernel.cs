@@ -91,7 +91,7 @@ public class SemanticKernelSkill : CodeActivity<string>
             //var promptTemplate = Skills.ForSkillAndFunction(skillName, functionName);
 
             //var function = kernel.CreateSemanticFunction(promptTemplate, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 });
-            var function = kernel.Functions.GetFunction(functionName);
+            var function = kernel.Functions.GetFunction(skillName, functionName);
             // set the context (our prompt)
             var contextVars = new ContextVariables();
             contextVars.Set("input", prompt);
