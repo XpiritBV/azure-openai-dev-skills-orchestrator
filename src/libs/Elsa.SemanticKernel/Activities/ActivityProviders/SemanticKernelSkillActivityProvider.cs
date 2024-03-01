@@ -157,16 +157,16 @@ public class SemanticKernelActivityProvider : IActivityProvider
         Type[] skillTypes = assembly.GetTypes().ToArray();
         foreach (Type skillType in skillTypes)
         {
-            if (skillType.Namespace.Equals("Microsoft.SKDevTeam"))
+            if (skillType.Namespace.Equals("Microsoft.AI.DevTeam.Skills"))
             {
                 skills.Add(skillType.Name);
                 var functions = skillType.GetFields();
                 foreach (var function in functions)
                 {
                     string field = function.FieldType.ToString();
-                    if (field.Equals("Microsoft.SKDevTeam.SemanticFunctionConfig"))
+                    if (field.Equals("System.String"))
                     {
-                        var promptTemplate = Skills.ForSkillAndFunction(skillType.Name, function.Name);
+                        var promptTemplate = (string)function.GetValue(null);
                         var skfunc = kernel.CreateSemanticFunction(
                             promptTemplate, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 });
 
@@ -186,7 +186,7 @@ public class SemanticKernelActivityProvider : IActivityProvider
     {
         var kernelSettings = KernelSettings.LoadSettings();
 
-        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(kernelSettings.LogLevel ?? LogLevel.Warning);
         });
