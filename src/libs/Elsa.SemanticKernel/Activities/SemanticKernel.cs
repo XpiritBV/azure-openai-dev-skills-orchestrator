@@ -159,7 +159,7 @@ public class SemanticKernelSkill : CodeActivity<string>
     {
         var kernelSettings = KernelSettings.LoadSettings();
 
-        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(kernelSettings.LogLevel ?? LogLevel.Warning);
         });

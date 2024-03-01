@@ -2,6 +2,7 @@ namespace Microsoft.AI.DevTeam.Skills;
 
 public static class Skills
 {
+    [Obsolete("This should be removed, opinion of Sjoerd")]
     public static string ForSkillAndFunction(string skillName, string functionName) => 
     (skillName, functionName) switch
     {
