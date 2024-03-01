@@ -35,7 +35,7 @@ public class SemanticKernelActivityProvider : IActivityProvider
         var kernel = KernelBuilder();
 
         // get a list of skills in the assembly
-        var skills = LoadSkillsFromAssemblyAsync("skills", kernel);
+        var skills = LoadSkillsFromAssemblyAsync("Microsoft.AI.DevTeam.Skills", kernel);
         SKContext context = kernel.CreateNewContext();
         var functionsAvailable = context.Functions.GetFunctionViews();
 
