@@ -163,8 +163,7 @@ public class SemanticKernelActivityProvider : IActivityProvider
                 var functions = skillType.GetFields();
                 foreach (var function in functions)
                 {
-                    string field = function.FieldType.ToString();
-                    if (field.Equals("System.String"))
+                    if (function.FieldType == typeof(string) && function.IsStatic)
                     {
                         var promptTemplate = (string)function.GetValue(null);
                         var skfunc = kernel.CreateSemanticFunction(
