@@ -19,11 +19,11 @@ public class GithubAuthService
         {
              // Use GitHubJwt library to create the GitHubApp Jwt Token using our private certificate PEM file
             var generator = new GitHubJwt.GitHubJwtFactory(
-                new GitHubJwt.StringPrivateKeySource(_githubSettings.AppKey),
+                new GitHubJwt.FilePrivateKeySource(_githubSettings.AppKey),
                 new GitHubJwt.GitHubJwtFactoryOptions
                 {
                     AppIntegrationId = _githubSettings.AppId, // The GitHub App Id
-                    ExpirationSeconds = 600 // 10 minutes is the maximum time allowed
+                    ExpirationSeconds = 60 // 10 minutes is the maximum time allowed
                 }
             );
 

@@ -92,8 +92,8 @@ public class SemanticKernelActivityProvider : IActivityProvider
                 activityInstance.Type = fullTypeName;
 
                 // Configure the activity's URL and method properties.
-                activityInstance.SkillName = new Input<string?>(function.PluginName);
-                activityInstance.FunctionName = new Input<string?>(function.Name);
+                activityInstance.SkillName = new Input<string>(function.PluginName);
+                activityInstance.FunctionName = new Input<string>(function.Name);
 
                 return activityInstance;
             }
