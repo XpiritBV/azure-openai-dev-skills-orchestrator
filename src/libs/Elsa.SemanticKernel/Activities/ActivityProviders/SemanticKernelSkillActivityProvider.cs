@@ -168,7 +168,7 @@ public class SemanticKernelActivityProvider : IActivityProvider
                     {
                         var promptTemplate = (string)function.GetValue(null);
                         var skfunc = kernel.CreateSemanticFunction(
-                            promptTemplate, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 });
+                            promptTemplate, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 }, function.Name, skillType.Name);
 
                         Console.WriteLine($"SKActivityProvider Added SK function: {skfunc.PluginName}.{skfunc.Name}");
                     }
