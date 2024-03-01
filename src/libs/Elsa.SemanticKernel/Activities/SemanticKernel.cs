@@ -85,11 +85,13 @@ public class SemanticKernelSkill : CodeActivity<string>
             // get the kernel
             var kernel = KernelBuilder();
 
+            var skills = LoadSkillsFromAssemblyAsync("Microsoft.AI.DevTeam.Skills", kernel);
+
             // load the skill
-            var promptTemplate = Skills.ForSkillAndFunction(skillName, functionName);
+            //var promptTemplate = Skills.ForSkillAndFunction(skillName, functionName);
 
-            var function = kernel.CreateSemanticFunction(promptTemplate, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 });
-
+            //var function = kernel.CreateSemanticFunction(promptTemplate, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 });
+            var function = kernel.Functions.GetFunction(functionName);
             // set the context (our prompt)
             var contextVars = new ContextVariables();
             contextVars.Set("input", prompt);
@@ -107,48 +109,6 @@ public class SemanticKernelSkill : CodeActivity<string>
             var answer = await kernel.RunAsync(contextVars, function);
             workflowContext.SetResult(answer);
         }
-    }
-
-    /// <summary>
-    /// Load the skills into the kernel
-    /// </summary>
-    private string ListSkillsInKernel(IKernel kernel)
-    {
-
-        var theSkills = LoadSkillsFromAssemblyAsync("skills", kernel);
-        SKContext context = kernel.CreateNewContext();
-        var functionsAvailable = context.Functions.GetFunctionViews();
-
-        var list = new StringBuilder();
-        foreach (var function in functionsAvailable)
-        {
-            Console.WriteLine($"Skill: {function.PluginName}");
-            
-                // Function description
-                if (function.Description != null)
-                {
-                    list.AppendLine($"// {function.Description}");
-                }
-                else
-                {
-                    Console.WriteLine("{0}.{1} is missing a description", function.PluginName, function.Name);
-                    list.AppendLine($"// Function {function.PluginName}.{function.Name}.");
-                }
-
-                // Function name
-                list.AppendLine($"{function.PluginName}.{function.Name}");
-
-                // Function parameters
-                foreach (var p in function.Parameters)
-                {
-                    var description = string.IsNullOrEmpty(p.Description) ? p.Name : p.Description;
-                    var defaultValueString = string.IsNullOrEmpty(p.DefaultValue) ? string.Empty : $" (default value: {p.DefaultValue})";
-                    list.AppendLine($"Parameter \"{p.Name}\": {description} {defaultValueString}");
-                }
-        }
-
-        Console.WriteLine($"List of all skills ----- {list.ToString()}");
-        return list.ToString();
     }
 
     /// <summary>
@@ -179,6 +139,7 @@ public class SemanticKernelSkill : CodeActivity<string>
         return kernel;
     }
 
+
     ///<summary>
     /// Gets a list of the skills in the assembly
     ///</summary>
@@ -189,20 +150,22 @@ public class SemanticKernelSkill : CodeActivity<string>
         Type[] skillTypes = assembly.GetTypes().ToArray();
         foreach (Type skillType in skillTypes)
         {
-            if (skillType.Namespace.Equals("Microsoft.SKDevTeam"))
+            if (skillType.Namespace.Equals("Microsoft.AI.DevTeam.Skills"))
             {
                 skills.Add(skillType.Name);
                 var functions = skillType.GetFields();
                 foreach (var function in functions)
                 {
-                    string field = function.FieldType.ToString();
-                    if (field.Equals("Microsoft.SKDevTeam.SemanticFunctionConfig"))
+                    if (function.FieldType == typeof(string) && function.IsStatic)
                     {
-                        var prompt = Skills.ForSkillAndFunction(skillType.Name, function.Name);
+                        var promptTemplate = (string)function.GetValue(null);
                         var skfunc = kernel.CreateSemanticFunction(
-                            prompt, new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 });
+                            promptTemplate,
+                            new OpenAIRequestSettings { MaxTokens = 8000, Temperature = 0.4, TopP = 1 },
+                            function.Name,
+                            skillType.Name);
 
-                        Console.WriteLine($"SK Added function: {skfunc.SkillName}.{skfunc.Name}");
+                        Console.WriteLine($"SKActivityProvider Added SK function: {skfunc.PluginName}.{skfunc.Name}");
                     }
                 }
             }
